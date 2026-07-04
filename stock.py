@@ -30,6 +30,9 @@ INDEX_MAP = {
     "twii": "^TWII",
     "櫃買": "^TWOII",
     "otc": "^TWOII",
+    # 自選清單關鍵字
+    "台積電": "TSM",
+    "特斯拉": "TSLA",
 }
 
 # 定時推播的指數清單
@@ -42,6 +45,15 @@ DAILY_INDICES = [
     ("^RUT", "羅素2000"),
     ("^VIX", "恐慌指數"),
     ("^TWII", "台灣加權"),
+]
+
+# 自選清單
+WATCHLIST = [
+    ("TSM",  "台積電 ADR"),
+    ("TSLA", "特斯拉"),
+    ("QLD",  "QLD"),
+    ("QQQM", "QQQM"),
+    ("VOO",  "VOO"),
 ]
 
 
@@ -88,6 +100,21 @@ def format_quote(symbol: str) -> str:
     )
 
 
+def watchlist_summary() -> str:
+    lines = ["⭐ 自選清單\n"]
+    for symbol, label in WATCHLIST:
+        data = _fetch(symbol)
+        if data is None:
+            lines.append(f"  {label}：查詢失敗")
+            continue
+        change = data["current"] - data["prev_close"]
+        pct = (change / data["prev_close"]) * 100
+        arrow = "▲" if change >= 0 else "▼"
+        sign = "+" if change >= 0 else ""
+        lines.append(f"{arrow} {label} ({symbol})：{data['current']:,.2f}  {sign}{pct:.2f}%")
+    return "\n".join(lines)
+
+
 def daily_summary() -> str:
     lines = ["📋 每日收盤摘要\n"]
     for symbol, label in DAILY_INDICES:
@@ -113,15 +140,19 @@ def query(text: str) -> str:
     if text_lower.isdigit() and len(text_lower) == 4:
         return format_quote(f"{text_lower}.TW")
 
-    # 中文關鍵字 → 指數代碼
+    # 中文關鍵字 → 指數/股票代碼
     symbol = INDEX_MAP.get(text_lower, text.strip().upper())
     return format_quote(symbol)
 
 
 HELP_TEXT = """📊 查詢指令說明
 
+⭐ 自選清單
+  我的清單
+
 🇺🇸 美股個股（輸入代號）
   AAPL TSLA NVDA MSFT AMZN
+  台積電 / 特斯拉
 
 🇺🇸 美股指數
   大盤 / S&P500
