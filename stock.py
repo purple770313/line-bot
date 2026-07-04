@@ -47,13 +47,20 @@ DAILY_INDICES = [
     ("^TWII", "台灣加權"),
 ]
 
-# 自選清單
+# 美股自選清單
 WATCHLIST = [
     ("TSM",  "台積電 ADR"),
     ("TSLA", "特斯拉"),
     ("QLD",  "QLD"),
     ("QQQM", "QQQM"),
     ("VOO",  "VOO"),
+]
+
+# 台股自選清單
+TW_WATCHLIST = [
+    ("2330.TW",   "台積電"),
+    ("4979.TWO",  "華星光"),
+    ("00631L.TW", "台灣50正2"),
 ]
 
 
@@ -100,9 +107,9 @@ def format_quote(symbol: str) -> str:
     )
 
 
-def watchlist_summary() -> str:
-    lines = ["⭐ 自選清單\n"]
-    for symbol, label in WATCHLIST:
+def _watchlist_lines(items: list, title: str) -> str:
+    lines = [f"{title}\n"]
+    for symbol, label in items:
         data = _fetch(symbol)
         if data is None:
             lines.append(f"  {label}：查詢失敗")
@@ -111,8 +118,16 @@ def watchlist_summary() -> str:
         pct = (change / data["prev_close"]) * 100
         arrow = "▲" if change >= 0 else "▼"
         sign = "+" if change >= 0 else ""
-        lines.append(f"{arrow} {label} ({symbol})：{data['current']:,.2f}  {sign}{pct:.2f}%")
+        lines.append(f"{arrow} {label} ({symbol.replace('.TW','')})：{data['current']:,.2f}  {sign}{pct:.2f}%")
     return "\n".join(lines)
+
+
+def watchlist_summary() -> str:
+    return _watchlist_lines(WATCHLIST, "⭐ 美股自選清單")
+
+
+def tw_watchlist_summary() -> str:
+    return _watchlist_lines(TW_WATCHLIST, "⭐ 台股自選清單")
 
 
 def daily_summary() -> str:
@@ -148,7 +163,8 @@ def query(text: str) -> str:
 HELP_TEXT = """📊 查詢指令說明
 
 ⭐ 自選清單
-  我的清單
+  我的清單（美股）
+  台股清單
 
 🇺🇸 美股個股（輸入代號）
   AAPL TSLA NVDA MSFT AMZN
