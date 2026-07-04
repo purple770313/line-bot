@@ -42,7 +42,7 @@ def push_daily_summary():
     if not targets:
         return
 
-    message = stock.daily_summary()
+    message = stock.daily_summary() + "\n\n" + stock.watchlist_summary()
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         for target_id in targets:
