@@ -123,6 +123,9 @@ def handle_message(event):
     # 查詢自己的 User ID
     if text in ("我的ID", "my id", "userid"):
         reply = f"您的 LINE User ID：\n{event.source.user_id}"
+    # 自選清單
+    elif text in ("我的清單", "自選清單", "清單"):
+        reply = stock.watchlist_summary()
     # 手動觸發推播（測試用）
     elif text == "測試推播":
         reply = stock.daily_summary()
