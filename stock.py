@@ -151,9 +151,12 @@ def query(text: str) -> str:
     if text_lower in ("說明", "help", "?", "？"):
         return HELP_TEXT
 
-    # 台股個股：純數字 4 碼 → 加 .TW
-    if text_lower.isdigit() and len(text_lower) == 4:
-        return format_quote(f"{text_lower}.TW")
+    # 台股個股：純數字 4~6 碼 → 先試 .TW，查無再試 .TWO
+    if text_lower.isdigit() and 4 <= len(text_lower) <= 6:
+        result = format_quote(f"{text_lower}.TW")
+        if "找不到" in result:
+            result = format_quote(f"{text_lower}.TWO")
+        return result
 
     # 中文關鍵字 → 指數/股票代碼
     symbol = INDEX_MAP.get(text_lower, text.strip().upper())
