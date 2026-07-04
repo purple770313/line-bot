@@ -42,7 +42,7 @@ def push_daily_summary():
     if not targets:
         return
 
-    message = stock.daily_summary() + "\n\n" + stock.watchlist_summary()
+    message = stock.daily_summary() + "\n\n" + stock.watchlist_summary() + "\n\n" + stock.tw_watchlist_summary()
     with ApiClient(configuration) as api_client:
         line_bot_api = MessagingApi(api_client)
         for target_id in targets:
@@ -123,9 +123,12 @@ def handle_message(event):
     # 查詢自己的 User ID
     if text in ("我的ID", "my id", "userid"):
         reply = f"您的 LINE User ID：\n{event.source.user_id}"
-    # 自選清單
-    elif text in ("我的清單", "自選清單", "清單"):
+    # 美股自選清單
+    elif text in ("我的清單", "自選清單", "清單", "美股清單"):
         reply = stock.watchlist_summary()
+    # 台股自選清單
+    elif text in ("台股清單", "我的台股", "台股自選"):
+        reply = stock.tw_watchlist_summary()
     # 手動觸發推播（測試用）
     elif text == "測試推播":
         reply = stock.daily_summary()
