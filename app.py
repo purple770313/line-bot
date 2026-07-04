@@ -59,7 +59,6 @@ def push_daily_summary():
 
 # 美股收盤後推播（台灣時間週二~六 05:30，對應美東時間前一天 16:30）
 # 台股收盤後推播（台灣時間週一~五 14:00）
-# 自訂推播（每天 10:17）
 scheduler = BackgroundScheduler(timezone="Asia/Taipei")
 scheduler.add_job(
     push_daily_summary,
@@ -70,11 +69,6 @@ scheduler.add_job(
     push_daily_summary,
     CronTrigger(day_of_week="mon-fri", hour=14, minute=0, timezone="Asia/Taipei"),
     id="tw_close",
-)
-scheduler.add_job(
-    push_daily_summary,
-    CronTrigger(hour=10, minute=17, timezone="Asia/Taipei"),
-    id="custom_1017",
 )
 scheduler.start()
 
